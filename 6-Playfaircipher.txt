@@ -1,0 +1,147 @@
+#include <iostream>
+#include <string>
+#include <cstring>
+using namespace std;
+
+#define SIZE 100
+
+void toLowerCase(char plain[], int ps) {
+    for (int i = 0; i < ps; i++) {
+        if (plain[i] >= 'A' && plain[i] <= 'Z') {
+            plain[i] += 32;
+        }
+    }
+}
+
+int removeSpaces(char* plain, int ps) {
+    int count = 0;
+    for (int i = 0; i < ps; i++) {
+        if (plain[i] != ' ') {
+            plain[count++] = plain[i];
+        }
+    }
+    return count;
+}
+
+void generateKeyTable(char key[], int ks, char keyT[5][5]) {
+    int dicty[26] = {0};
+    dicty['j' - 'a'] = 1; // Treat 'j' as 'i'
+
+    int i = 0, j = 0;
+    for (int k = 0; k < ks; k++) {
+        if (key[k] == 'j') key[k] = 'i'; // Replace j with i
+        if (dicty[key[k] - 'a'] == 0) {
+            dicty[key[k] - 'a'] = 1;
+            keyT[i][j++] = key[k];
+            if (j == 5) {
+                i++;
+                j = 0;
+            }
+        }
+    }
+
+    for (int k = 0; k < 26; k++) {
+        if (dicty[k] == 0) {
+            keyT[i][j++] = k + 'a';
+            if (j == 5) {
+                i++;
+                j = 0;
+            }
+        }
+    }
+}
+
+void search(char keyT[5][5], char a, char b, int arr[]) {
+    if (a == 'j') a = 'i';
+    if (b == 'j') b = 'i';
+
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            if (keyT[i][j] == a) {
+                arr[0] = i;
+                arr[1] = j;
+            }
+            if (keyT[i][j] == b) {
+                arr[2] = i;
+                arr[3] = j;
+            }
+        }
+    }
+}
+
+void prepareDigraphs(char text[], int& ps) {
+    for (int i = 0; i < ps - 1; i++) {
+        if (text[i] == text[i + 1]) {
+            for (int j = ps; j > i + 1; j--) {
+                text[j] = text[j - 1];
+            }
+            text[i + 1] = 'x';
+            ps++;
+        }
+    }
+    if (ps % 2 != 0) {
+        text[ps++] = 'x';
+    }
+    text[ps] = '\0'; // Null terminate
+}
+
+string encrypt(char keyT[5][5], char text[], int ps) {
+    string ciphertext = "";
+    int arr[4];
+
+    for (int i = 0; i < ps; i += 2) {
+        char a = text[i];
+        char b = text[i + 1];
+        search(keyT, a, b, arr);
+
+        if (arr[0] == arr[2]) {
+            ciphertext += keyT[arr[0]][(arr[1] + 1) % 5];
+            ciphertext += keyT[arr[2]][(arr[3] + 1) % 5];
+        } else if (arr[1] == arr[3]) {
+            ciphertext += keyT[(arr[0] + 1) % 5][arr[1]];
+            ciphertext += keyT[(arr[2] + 1) % 5][arr[3]];
+        } else {
+            ciphertext += keyT[arr[0]][arr[3]];
+            ciphertext += keyT[arr[2]][arr[1]];
+        }
+    }
+
+    return ciphertext;
+}
+
+int main() {
+    char key[SIZE], text[SIZE];
+
+    cout << "Enter the key: ";
+    cin.getline(key, SIZE);
+
+    cout << "Enter the plaintext: ";
+    cin.getline(text, SIZE);
+
+    int ks = strlen(key);
+    int ps = strlen(text);
+
+    toLowerCase(key, ks);
+    toLowerCase(text, ps);
+
+    ks = removeSpaces(key, ks);
+    ps = removeSpaces(text, ps);
+
+    prepareDigraphs(text, ps);
+
+    char keyT[5][5];
+    generateKeyTable(key, ks, keyT);
+
+    cout << "\nKey Table:\n";
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            cout << keyT[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    string ciphertext = encrypt(keyT, text, ps);
+    cout << "\nCiphertext: " << ciphertext << endl;
+
+    return 0;
+}

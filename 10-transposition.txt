@@ -1,0 +1,51 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+string substitutionEncrypt(string text, int shift) {
+    string result = "";
+    for (char ch : text) {
+        if (isalpha(ch)) {
+            char base = isupper(ch) ? 'A' : 'a';
+            result += char((ch - base + shift) % 26 + base);
+        } else {
+            result += ch;
+        }
+    }
+    return result;
+}
+
+string transpositionEncrypt(string text) {
+    return string(text.rbegin(), text.rend());
+}
+
+string transpositionDecrypt(string text) {
+    return string(text.rbegin(), text.rend());
+}
+
+string substitutionDecrypt(string text, int shift) {
+    return substitutionEncrypt(text, 26 - (shift % 26));
+}
+
+int main() {
+    string plaintext;
+    int shift;
+
+    cout << "Enter the plaintext: ";
+    getline(cin, plaintext);
+    cout << "Enter the shift for substitution cipher: ";
+    cin >> shift;
+
+    string subEncrypted = substitutionEncrypt(plaintext, shift);
+    string finalEncrypted = transpositionEncrypt(subEncrypted);
+
+    cout << "\nEncrypted Text: " << finalEncrypted << endl;
+
+    string transDecrypted = transpositionDecrypt(finalEncrypted);
+    string originalText = substitutionDecrypt(transDecrypted, shift);
+
+    cout << "Decrypted Text: " << originalText << endl;
+
+    return 0;
+}
+

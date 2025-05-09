@@ -1,0 +1,45 @@
+Modified Ceaser cipher 
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string text;
+    int key;
+
+    cout << "Enter your name: ";
+    getline(cin, text);
+
+    cout << "Enter key: ";
+    cin >> key;
+
+    string encryptedText = "";
+
+    for (int i = 0; i < text.length(); i++) {
+        char ch = text[i];
+        if (isupper(ch)) {
+            ch = (ch - 'A' + key) % 26 + 'A';
+        } else if (islower(ch)) {
+            ch = (ch - 'a' + key) % 26 + 'a';
+        }
+        encryptedText = encryptedText + ch;
+    }
+
+    cout << "\n";
+    cout << "Encrypted Name: " << encryptedText << endl;
+
+    string decryptedText = "";
+    for (int i = 0; i < encryptedText.length(); i++) {
+        char ch = encryptedText[i];
+        if (isupper(ch)) {
+            ch = (ch - 'A' - key + 26) % 26 + 'A';
+        } else if (islower(ch)) {
+            ch = (ch - 'a' - key + 26) % 26 + 'a';
+        }
+        decryptedText = decryptedText + ch;
+    }
+
+    cout << "\n";
+    cout << "Decrypted Name: " << decryptedText << endl;
+}

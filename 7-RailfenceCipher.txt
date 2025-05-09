@@ -1,0 +1,88 @@
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+int main() {
+    char plainText[] = "Samyak Kalaskar";
+    int key = 3;
+
+    char noSpaceText[100];
+    int len = strlen(plainText);
+    int idx = 0;
+    for (int i = 0; i < len; i++) {
+        if (plainText[i] != ' ') {
+            noSpaceText[idx++] = plainText[i];
+        }
+    }
+    noSpaceText[idx] = '\0';
+    int msgLen = strlen(noSpaceText);
+
+    char encText[100];
+    char railMatrix[key][msgLen];
+
+    for (int i = 0; i < key; ++i) {
+        for (int j = 0; j < msgLen; ++j) {
+            railMatrix[i][j] = '\n';
+        }
+    }
+
+    int row = 0, col = 0;
+    bool down = false;
+    for (int i = 0; i < msgLen; ++i) {
+        railMatrix[row][col++] = noSpaceText[i];
+        if (row == 0 || row == key - 1) down = !down;
+        row += down ? 1 : -1;
+    }
+
+    int m = 0;
+    for (int i = 0; i < key; ++i) {
+        for (int j = 0; j < msgLen; ++j) {
+            if (railMatrix[i][j] != '\n') {
+                encText[m++] = railMatrix[i][j];
+            }
+        }
+    }
+    encText[m] = '\0';
+    cout << "\nEncrypted Message: " << encText << endl;
+
+    for (int i = 0; i < key; ++i) {
+        for (int j = 0; j < msgLen; ++j) {
+            railMatrix[i][j] = '\n';
+        }
+    }
+
+    row = 0;
+    col = 0;
+    down = false;
+    for (int i = 0; i < msgLen; ++i) {
+        railMatrix[row][col++] = '*';
+        if (row == 0 || row == key - 1) down = !down;
+        row += down ? 1 : -1;
+    }
+
+    m = 0;
+    for (int i = 0; i < key; ++i) {
+        for (int j = 0; j < msgLen; ++j) {
+            if (railMatrix[i][j] == '*' && m < msgLen) {
+                railMatrix[i][j] = encText[m++];
+            }
+        }
+    }
+
+    char decText[100];
+    row = 0;
+    col = 0;
+    down = false;
+    m = 0;
+    for (int i = 0; i < msgLen; ++i) {
+        decText[m++] = railMatrix[row][col++];
+        if (row == 0 || row == key - 1) down = !down;
+        row += down ? 1 : -1;
+    }
+    decText[m] = '\0';
+    cout << "Decrypted Message: " << decText << endl;
+
+    return 0;
+}
+
+

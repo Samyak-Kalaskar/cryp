@@ -1,0 +1,53 @@
+Block cipher 
+
+#include <iostream>
+#include <string>
+#include <bitset>
+
+using namespace std;
+
+int main() {
+    string plaintext;
+    string key;
+
+    cout << "Enter the plain text: ";
+    getline(cin, plaintext);
+
+    cout << "Enter the key: ";
+    getline(cin, key);
+
+    string encryptedText;
+
+    for (int i = 0; i < plaintext.length(); i += 4) {
+        string block = plaintext.substr(i, 4);
+
+        while (block.length() < 4) {
+            block += ' ';
+        }
+
+        string encryptedBlock;
+        for (int j = 0; j < 4; j++) {
+            char c = block[j] ^ key[j];
+            encryptedBlock += c;
+        }
+
+        encryptedText += encryptedBlock;
+    }
+
+    string decryptedText;
+    for (int i = 0; i < encryptedText.length(); i += 4) {
+        string block = encryptedText.substr(i, 4);
+
+        string decryptedBlock;
+        for (int j = 0; j < 4; j++) {
+            char c = block[j] ^ key[j];
+            decryptedBlock += c;
+        }
+
+        decryptedText += decryptedBlock;
+    }
+
+    cout << "Decrypted Text: " << decryptedText << endl;
+
+    return 0;
+}
