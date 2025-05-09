@@ -1,0 +1,73 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <iomanip>
+
+const int BLOCK_SIZE = 8; // 8 bytes block
+
+// Pads the input to be a multiple of block size
+std::string padString(const std::string& input) {
+    std::string padded = input;
+    while (padded.size() % BLOCK_SIZE != 0) {
+        padded += '\0';  // Null byte padding
+    }
+    return padded;
+}
+
+// Encrypts a block using XOR with a key
+std::string xorBlockCipher(const std::string& input, const std::string& key) {
+    std::string output = input;
+    for (size_t i = 0; i < input.size(); ++i) {
+        output[i] = input[i] ^ key[i % key.size()];
+    }
+    return output;
+}
+
+int main() {
+    std::string plaintext;
+    std::string key;
+
+    std::cout << "Enter plaintext: ";
+    std::getline(std::cin, plaintext);
+
+    std::cout << "Enter key (max " << BLOCK_SIZE << " chars): ";
+    std::getline(std::cin, key);
+
+    if (key.size() > BLOCK_SIZE) {
+        key = key.substr(0, BLOCK_SIZE); // Trim to block size
+    }
+
+    // Pad key if it's shorter than block size
+    while (key.size() < BLOCK_SIZE) {
+        key += '\0';
+    }
+
+    // Pad plaintext
+    std::string paddedPlaintext = padString(plaintext);
+
+    // Encrypt
+    std::string ciphertext;
+    for (size_t i = 0; i < paddedPlaintext.size(); i += BLOCK_SIZE) {
+        std::string block = paddedPlaintext.substr(i, BLOCK_SIZE);
+        ciphertext += xorBlockCipher(block, key);
+    }
+
+    // Display ciphertext in hex
+    std::cout << "\nEncrypted (hex): ";
+    for (unsigned char c : ciphertext) {
+        std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)c << " ";
+    }
+    std::cout << std::dec << "\n";
+
+    // Decrypt (same as encrypt with XOR)
+    std::string decryptedText;
+    for (size_t i = 0; i < ciphertext.size(); i += BLOCK_SIZE) {
+        std::string block = ciphertext.substr(i, BLOCK_SIZE);
+        decryptedText += xorBlockCipher(block, key);
+    }
+
+    std::cout << "Decrypted text: " << decryptedText << "\n";
+
+    return 0;
+}
+
